@@ -21,9 +21,11 @@
 \providecommand{\BIBdecl}{\relax}
 \BIBdecl
 
-\bibitem{carter2002schaum}
-N.~P. Carter, \emph{Schaum's Outline of Computer Architecture}, 1st~ed., ser.
-  Schaum's Outline Series.\hskip 1em plus 0.5em minus 0.4em\relax New Delhi,
-  India: McGraw-Hill, 2002.
+\bibitem{feng2025tensor}
+Z.~Feng, H.~Zhang, A.~Li, L.~Xing, D.~Wu, and Y.~Liu, ``A tensor core
+  architecture for large-scale matrix multiplication operations on gpgpu
+  processor,'' in \emph{2025 4th International Symposium on Semiconductor and
+  Electronic Technology (ISSET)}.\hskip 1em plus 0.5em minus 0.4em\relax IEEE,
+  2025, pp. 246--249.
 
 \end{thebibliography}

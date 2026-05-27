@@ -83,7 +83,68 @@ tencioyonaikel@estudiantec.cr}
 
 \section{Fundamentos teóricos}
 
-Cita de base (prueba temporal) \cite{carter2002schaum}.
+...
+
+\section{Núcleos tensoriales}
+Ante el rápido avance de la inteligencia artificial y del aprendizaje profundo, 
+las unidades de cómputo tradicionales (como los procesadores de flujo convencionales),
+se volvieron insuficientes para satisfacer la carga computacional requerida por 
+los tensores de gran tamaño (estructuras de datos multidimensionales).
+
+Debido a esta limitante, surgió la necesidad de integrar estructuras de aceleración heterogénea
+especializadas en operadores específicos. Ante esto, la empresa NVIDIA introdujo por primera
+vez una unidad de procesamiento de tensores dedicada, conocida como Tensor Core (Núcleo Tensorial).
+Su propósito era subsanar las deficiencias de cálculo matricial de sus GPUs convencionales, por medio de 
+la aceleración por hardware de precisión mixta, con el objetivo de reducir los tiempos de ejecución
+al procesar volúmenes masivos de datos. 
+
+\subsection{El Arreglo Sistólico como el núcleo del Tensor Core}
+Para comprender cómo los núcleos tensoriales logran esta eficiencia disruptiva frente a las unidades 
+tradicionales de la GPU, es crucial vincularlos con el concepto de los arreglos sistólicos (systolic arrays). 
+Un sistema de cómputo tradicional se ve drásticamente limitado por los constantes accesos y transferencias 
+hacia la memoria principal. En contraste, un núcleo tensorial moderno no reinventa las matemáticas del álgebra lineal, 
+sino que adopta la estructura paralela de un arreglo sistólico bidimensional como su propio núcleo de procesamiento computacional.
+
+La arquitectura del núcleo tensorial aprovecha precisamente la ventaja competitiva de los arreglos sistólicos: una malla 
+o red bidimensional de Unidades de Procesamiento (PE, Processing Units) interconectadas directamente a nivel de 
+hardware mediante una segmentación (pipeline) balanceada.
+
+\subsection{La operación MMA}
+Los Tensor Cores están diseñados específicamente para resolver la ecuación de multiplicación
+y acumulación de matrices (MMA, Matrix Multiply-Accumulate), según muestra la ecuación \ref{eq:MMA}:
+
+\begin{equation}
+  D = A \times B + C
+  \label{eq:MMA}
+\end{equation}
+
+En este proceso, $A$ y $B$ son las matrices que se multiplican entre sí. Las cuales suelen estar 
+en formatos de baja precisión como FP16 (16 bits de punto flotante) o INT8 (8 bits enteros), lo que 
+permite una mayor velocidad de procesamiento.
+
+La matriz $C$ es la matriz de acumulación, generalmente manejada con una precisión mayor como FP32 (32 bits de punto flotante) para 
+evitar la pérdida de información y mitigar los errores de redondeo.
+
+Por último, el resultado final de la operación se entrega en la matriz $D$, también de alta precisión.
+
+\subsection{Flujo de ejecución en el Hardware}
+Las matrices de los modelos de aprendizaje profundo, son muy grandes, por lo que 
+un núcleo tensorial no puede procesarlas de golpe. En su lugar, se puede aplicar una
+estrategia jerárquica de división y ejecución, basada en el flujo
+de datos de un arreglo sistólico \cite{feng2025tensor}.
+
+\subsubsection{Segmentación por bloques}
+
+\subsubsection{Distribución escalonada de datos}
+
+\subsubsection{El flujo sistólico y el reúso de datos}
+
+\subsubsection{Acumulación y resultado final}
+
+
+\section{TPU de Google}
+
+\section{Optimización de arreglos MAC}
 
 
 
