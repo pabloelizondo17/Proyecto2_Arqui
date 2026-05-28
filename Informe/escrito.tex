@@ -133,13 +133,29 @@ un núcleo tensorial no puede procesarlas de golpe. En su lugar, se puede aplica
 estrategia jerárquica de división y ejecución, basada en el flujo
 de datos de un arreglo sistólico \cite{feng2025tensor}.
 
-\subsubsection{Segmentación por bloques}
+\subsubsection{Segmentación por bloques} 
+Las matrices de gran tamaño ($A, B y C$) se fragmentan en subtares de dimensiones fijas
+que coinciden exactamente con el tamaño físico del arreglo de hardware.
+
 
 \subsubsection{Distribución escalonada de datos}
+La manera en la que los datos son introducidos al núcleo tensorial, no es en forma de un 
+bloque completo, sino que se introducen de manera síncrona y escalonada, por filas y columnas.
+Lo anterior implica que cada elemento de la matriz entra al circuito con un retraso de un ciclo
+de reloj respecto a su fila o columna vecina, lo que crea una onda de datos coordinados. 
 
 \subsubsection{El flujo sistólico y el reúso de datos}
+Acá es donde entra en juego la magia de los arreglos sistólicos. Una vez que los datos se encuentran
+dentro de la cuadrícula bidimensional (de PEs), estos fluyen siguiendo el ritmo de un "pulso cardiaco".
+De esta forma, cada unidad PE recibe un elemento de la matriz $A$ por la izquierda y un elemento de la matriz $B$ 
+desde arriba, realizando la multiplicación de los dos elementos individuales y sumándoles un valor acumulado intermedio;
+inmediatamente después, la PE pasa el elemento de $A$ y $B$ de la misma forma que como se mencionó al inicio.
 
 \subsubsection{Acumulación y resultado final}
+Cada unidad PE aprovecha su registro de acumulación para ir almacenando el resultado de las multiplicaciones
+parciales. En la práctica, se suele "precargar" la matriz $C$ antes de la entrada de los datos provenientes de
+las matrices $A$ y $B$, de esta manera tras sumar cada valor de la matriz $C$ y los valores acumulados de las 
+multiplicaciones parciales, el resultado final de la matriz $D$ se encuentra consolidado.
 
 
 \section{TPU de Google}

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.2) (preloaded format=pdflatex 2026.3.18)  27 MAY 2026 17:59
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.2) (preloaded format=pdflatex 2026.3.18)  28 MAY 2026 08:44
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -687,10 +687,10 @@ Package: fancyhdr 2025/02/07 v5.2 Extensive control of page headers and footers
 File: l3backend-pdftex.def 2025-10-09 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count350
 ) (c:\LaTex\Proyecto2_Arqui\Informe\build\escrito.aux
-LaTeX Info: Redefining \. on input line 15.
-LaTeX Info: Redefining \% on input line 15.
+LaTeX Info: Redefining \. on input line 12.
+LaTeX Info: Redefining \% on input line 12.
 Package babel Info: 'spanish' activates 'spanish' shorthands.
-(babel)             Reported on input line 15.
+(babel)             Reported on input line 12.
 )
 \openout1 = `escrito.aux'.
 
@@ -749,7 +749,10 @@ File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 LaTeX Font Info:    Trying to load font information for U+msb on input line 116.
  (C:\Users\pablo\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
-) (c:\LaTex\Proyecto2_Arqui\Informe\build\escrito.bbl)
+) [1{C:/Users/pablo/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}{C:/Users/pablo/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc}
+
+
+] (c:\LaTex\Proyecto2_Arqui\Informe\build\escrito.bbl)
 
 ** Conference Paper **
 Before submitting the final camera ready copy, remember to:
@@ -765,12 +768,11 @@ Before submitting the final camera ready copy, remember to:
 Package caption Warning: Unused \captionsetup[table] on input line 20.
 See the caption package documentation for explanation.
 
-[1{C:/Users/pablo/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}{C:/Users/pablo/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc}
-
+[2
 
 ] (c:\LaTex\Proyecto2_Arqui\Informe\build\escrito.aux
-LaTeX Info: Redefining \. on input line 15.
-LaTeX Info: Redefining \% on input line 15.
+LaTeX Info: Redefining \. on input line 12.
+LaTeX Info: Redefining \% on input line 12.
 )
  ***********
 LaTeX2e <2025-11-01>
@@ -780,17 +782,17 @@ Package rerunfilecheck Info: File `escrito.out' has not changed.
 (rerunfilecheck)             Checksum: 841F9101A0EC53ED8E2969DD712D4DA4;2482.
  ) 
 Here is how much of TeX's memory you used:
- 26787 strings out of 467867
- 522392 string characters out of 5418334
- 971401 words of memory out of 5000000
- 55233 multiletter control sequences out of 15000+600000
+ 26796 strings out of 467867
+ 522506 string characters out of 5418334
+ 972401 words of memory out of 5000000
+ 55241 multiletter control sequences out of 15000+600000
  657720 words of font info for 95 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 84i,12n,94p,470b,469s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 84i,12n,94p,470b,471s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/pablo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Users/pablo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/pablo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/pablo/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmr8a.pfb><C:/Users/pablo/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmri8a.pfb>
-Output written on c:\LaTex\Proyecto2_Arqui\Informe\build\escrito.pdf (1 page, 76902 bytes).
+Output written on c:\LaTex\Proyecto2_Arqui\Informe\build\escrito.pdf (2 pages, 80120 bytes).
 PDF statistics:
- 100 PDF objects out of 1000 (max. 8388607)
- 17 named destinations out of 1000 (max. 500000)
+ 104 PDF objects out of 1000 (max. 8388607)
+ 18 named destinations out of 1000 (max. 500000)
  117 words of extra memory for PDF output out of 10000 (max. 10000000)
 

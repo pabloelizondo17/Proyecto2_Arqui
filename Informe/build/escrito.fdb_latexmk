@@ -1,13 +1,13 @@
 # Fdb version 4
-["bibtex build/escrito"] 1779926349.20341 "build/escrito.aux" "build/escrito.bbl" "build/escrito" 1779926352.19269 0
+["bibtex build/escrito"] 1779978974.59658 "build/escrito.aux" "build/escrito.bbl" "build/escrito" 1779979455.81475 0
   "./literatura.bib" 1779926160 750 8368aac6cdb4f5e96358d4e565211442 ""
   "C:/Users/pablo/AppData/Local/Programs/MiKTeX/bibtex/bst/ieeetran/IEEEtran.bst" 1440622569 57748 7c8250ecf02814ce6ddc0cdbb63df1dd ""
-  "build/escrito.aux" 1779926351 2289 9f7547a5ed7a7a43c2b76b861c94f36b "pdflatex"
+  "build/escrito.aux" 1779979454 2289 732adfbc49f68954a97f7cf110b18253 "pdflatex"
   (generated)
   "build/escrito.bbl"
   "build/escrito.blg"
   (rewritten before read)
-["pdflatex"] 1779926349.62563 "c:/LaTex/Proyecto2_Arqui/Informe/escrito.tex" "build/escrito.pdf" "escrito" 1779926352.19378 0
+["pdflatex"] 1779979452.55481 "c:/LaTex/Proyecto2_Arqui/Informe/escrito.tex" "build/escrito.pdf" "escrito" 1779979455.81576 0
   "C:/Users/pablo/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map" 1779754248 85260 dc52748e22016f0b1395c31b09e26c4f ""
   "C:/Users/pablo/AppData/Local/MiKTeX/miktex/data/le/pdftex/pdflatex.fmt" 1773891195 13333849 4a0400ba1b5d22fbf93ff37f9e9d64d3 ""
   "C:/Users/pablo/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc" 1458473887 4993 80dc9bab7f31fb78a000ccfed0e27cab ""
@@ -175,11 +175,11 @@
   "C:/Users/pablo/AppData/Local/Programs/MiKTeX/tex/latex/tools/tabularx.sty" 1761901070 7243 a2c17f18e2c9b702b84fad03d5f9c78b ""
   "C:/Users/pablo/AppData/Local/Programs/MiKTeX/tex/latex/url/url.sty" 1388490452 12796 8edb7d69a20b857904dd0ea757c14ec9 ""
   "C:/Users/pablo/AppData/Local/Programs/MiKTeX/tex/latex/xcolor/xcolor.sty" 1729265222 55384 b454dec21c2d9f45ec0b793f0995b992 ""
-  "build/escrito.aux" 1779926351 2289 9f7547a5ed7a7a43c2b76b861c94f36b "pdflatex"
-  "build/escrito.bbl" 1779926349 1257 0055433fd57a8b10852aa23363bcb31f "bibtex build/escrito"
-  "build/escrito.out" 1779926351 2482 841f9101a0ec53ed8e2969dd712d4da4 "pdflatex"
-  "c:/LaTex/Proyecto2_Arqui/Informe/escrito.tex" 1779926342 5810 87f6a319c793706dbe385c8f66ee4bf4 ""
-  "escrito.tex" 1779926342 5810 87f6a319c793706dbe385c8f66ee4bf4 ""
+  "build/escrito.aux" 1779979454 2289 732adfbc49f68954a97f7cf110b18253 "pdflatex"
+  "build/escrito.bbl" 1779978974 1257 0055433fd57a8b10852aa23363bcb31f "bibtex build/escrito"
+  "build/escrito.out" 1779979454 2482 841f9101a0ec53ed8e2969dd712d4da4 "pdflatex"
+  "c:/LaTex/Proyecto2_Arqui/Informe/escrito.tex" 1779979447 7345 5d798e4564ec2262fdec36965e6eece0 ""
+  "escrito.tex" 1779979447 7345 5d798e4564ec2262fdec36965e6eece0 ""
   (generated)
   "build/escrito.aux"
   "build/escrito.log"
