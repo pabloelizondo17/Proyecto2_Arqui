@@ -111,7 +111,7 @@ hardware mediante una segmentación (pipeline) balanceada.
 
 \subsection{La operación MMA}
 Los Tensor Cores están diseñados específicamente para resolver la ecuación de multiplicación
-y acumulación de matrices (MMA, Matrix Multiply-Accumulate), según muestra la ecuación \ref{eq:MMA}:
+y acumulación de matrices (MMA, Matrix Multiply-Accumulate) \cite{feng2025tensor}, según muestra la ecuación \ref{eq:MMA}:
 
 \begin{equation}
   D = A \times B + C
@@ -134,7 +134,7 @@ estrategia jerárquica de división y ejecución, basada en el flujo
 de datos de un arreglo sistólico \cite{feng2025tensor}.
 
 \subsubsection{Segmentación por bloques} 
-Las matrices de gran tamaño ($A, B y C$) se fragmentan en subtares de dimensiones fijas
+Las matrices de gran tamaño ($A,~B~y~C$) se fragmentan en subtareas de dimensiones fijas
 que coinciden exactamente con el tamaño físico del arreglo de hardware.
 
 
@@ -153,9 +153,48 @@ inmediatamente después, la PE pasa el elemento de $A$ y $B$ de la misma forma q
 
 \subsubsection{Acumulación y resultado final}
 Cada unidad PE aprovecha su registro de acumulación para ir almacenando el resultado de las multiplicaciones
-parciales. En la práctica, se suele "precargar" la matriz $C$ antes de la entrada de los datos provenientes de
+parciales. En la práctica, se suele "precargar"~la matriz $C$ antes de la entrada de los datos provenientes de
 las matrices $A$ y $B$, de esta manera tras sumar cada valor de la matriz $C$ y los valores acumulados de las 
 multiplicaciones parciales, el resultado final de la matriz $D$ se encuentra consolidado.
+
+\subsection{El problema de la subutilización}
+Un problema en la aplicación de los núcleos tensoriales, aparece al momento de considerar 
+todo el sistema arquitectónico que los rodea, ya que esto suma limitaciones al sistema que genera
+una severa subutilización de los núcleos tensoriales \cite{nada2025cooperative}. Lo anterior
+se puede explicar por tres razones principalmente.
+
+\begin{itemize}
+    \item \textbf{La asimetría de la jerarquía de memoria:} Las operaciones de multiplicación de matrices generales (GEMM), 
+    requieren un flujo constante y masivo de datos. Mientras que los \textit{tensor cores} pueden procesar los datos
+    casi instantáneamente a nivel de registros, el tiempo que toma mover los datos desde la memoria global hasta la memoria compartida, 
+    y luego a los registros de los hilos, es órdenes de magnitud más lento.
+
+    \item \textbf{Dependencias de datos e instrucciones (Latencia del Pipeline):} Las instrucciones de "soporte" provenientes del software
+    de la GPU, llegan a saturar las unidades de ejecución, lo que provoca que la emisión de instrucciones hacia el
+    \textit{tensor core} sea intermitente. 
+    
+    \item \textbf{Acoplamiento rígido de recursos:} Como los núcleos tensoriales están asignados fijamente a un número específico de
+    unidades de procesamiento, en caso de que el grupo de hilos se llegue a retrasar, ya sea buscando datos en memoria o resolviendo una
+    bifurcación de código, el \textit{tensor core} queda congelado, desperdiciando ciclos de reloj valiosos. 
+\end{itemize}
+
+
+\subsection{La dimensión de ejecución y el rol de los warps}
+El \textit{Warp} es el bloque básico de ejecución en el modelo SIMT de las GPU, el cual consiste en 
+un grupo de hilos que ejecutan la misma intrucción de forma simultánea, sobre diferentes datos \cite{nada2025cooperative}.
+
+Bajo este nivel de abstracción, el programador de GPU escribe el código pensando en hilos individuales; no obstante, 
+un solo hilo de la GPU no puede controlar un núcleo tensorial. Además, la operación matemática MMA se expone al sistema como una
+instrucción intrínseca a nivel de Warp. Al final, ningún hilo posee la matriz completa; cada hilo guarda en sus registros privados
+una pequeña porción de las matrices de entrada $A$ y $B$. 
+
+Una solución a la subutilización de los núcleos tensoriales, es que múltiples Warps compartan el mismo \textit{tensor core}
+de manera dinámica, esto mediante un planificador especializado a nivel de arquitectura. De esta forma,
+mientras un Warp se encuentra en espera, el hardware conmuta de inmediato el contexto para que otro
+Warp totalmente independiente tome el control del núcleo tensorial e inicie su propio cálculo \cite{nada2025cooperative}.
+
+
+
 
 
 \section{TPU de Google}

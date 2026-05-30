@@ -28,4 +28,10 @@ Z.~Feng, H.~Zhang, A.~Li, L.~Xing, D.~Wu, and Y.~Liu, ``A tensor core
   Electronic Technology (ISSET)}.\hskip 1em plus 0.5em minus 0.4em\relax IEEE,
   2025, pp. 246--249.
 
+\bibitem{nada2025cooperative}
+A.~Nada, G.~M. Sarda, and E.~Lenormand, ``Cooperative warp execution in tensor
+  core for risc-v gpgpu,'' in \emph{2025 IEEE International Symposium on High
+  Performance Computer Architecture (HPCA)}.\hskip 1em plus 0.5em minus
+  0.4em\relax IEEE, 2025, pp. 1424--1436.
+
 \end{thebibliography}
