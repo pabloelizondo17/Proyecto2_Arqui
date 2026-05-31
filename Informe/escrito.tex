@@ -282,10 +282,71 @@ Este enfoque de integrar unidades heterogéneas especializadas en un mismo ASIC 
 Investigaciones recientes han explorado extensiones de este principio al nivel del arreglo sistólico, buscando co-diseñar la estructura del hardware con las propiedades de los modelos, como el co-diseño entre dimensiones del arreglo y bloques de \textit{pruning} estructurado propuesto por Palacios et al.\ \cite{palacios2024pruning}, que reporta aceleraciones de hasta el 44\,\% en sistemas edge con solo un 1.4\,\% de degradación en la tasa de error.
 
 
-
-
 \section{Optimización de arreglos MAC}
 
+\subsection{Rol de las operaciones MAC en cargas matriciales}
+
+Las operaciones de multiplicación-acumulación, conocidas como MAC por sus siglas en inglés (\textit{Multiply-Accumulate}), son una de las operaciones fundamentales en aceleradores para inteligencia artificial. Una operación MAC realiza una multiplicación entre dos datos y acumula el resultado sobre una suma parcial. De forma general, puede representarse como:
+
+\begin{equation}
+    y = y + a \cdot b
+\end{equation}
+
+Esta operación aparece de manera repetitiva en cargas matriciales, como la multiplicación de matrices, las capas completamente conectadas y las convoluciones utilizadas en redes neuronales profundas. Por ejemplo, en una multiplicación matricial, cada elemento de la matriz de salida se obtiene acumulando productos entre una fila de la primera matriz y una columna de la segunda matriz. Por esta razón, una gran parte del tiempo de cómputo en este tipo de aplicaciones se concentra en ejecutar muchas operaciones MAC de forma eficiente \cite{xu2023survey}.
+
+En los arreglos sistólicos, estas operaciones se distribuyen entre varios elementos de procesamiento o PEs. Cada PE puede ejecutar operaciones aritméticas simples, especialmente multiplicaciones y acumulaciones, mientras los datos avanzan de forma ordenada a través del arreglo. Así, en lugar de resolver una carga matricial de manera secuencial en un procesador general, el arreglo permite que muchas operaciones MAC se ejecuten en paralelo \cite{xu2023survey}.
+
+Desde el punto de vista arquitectónico, optimizar arreglos MAC no significa únicamente aumentar la cantidad de unidades de cómputo. También implica organizar adecuadamente cómo se distribuyen las operaciones, cómo se alimentan los PEs con datos y cómo se acumulan los resultados parciales. Esta idea también aparece en implementaciones recientes, donde la multiplicación y la suma se identifican como los principales costos computacionales durante la inferencia de redes neuronales, por lo que el diseño eficiente de unidades MAC resulta clave para mejorar el rendimiento del acelerador \cite{cao2025hmsa}.
+
+\subsection{Paralelismo y reutilización de datos}
+
+Una de las razones por las que los arreglos MAC son eficientes es que permiten explotar paralelismo espacial. En lugar de ejecutar una operación MAC tras otra de forma secuencial, el arreglo distribuye el trabajo entre múltiples elementos de procesamiento, de manera que varios productos y acumulaciones pueden calcularse al mismo tiempo. Esto es especialmente útil en multiplicaciones de matrices y convoluciones, donde existen muchas operaciones independientes o parcialmente independientes que pueden ejecutarse en paralelo.
+
+Además del paralelismo, la reutilización de datos es un aspecto clave. En una multiplicación matricial, un mismo dato de entrada puede participar en varios productos antes de dejar de ser útil. Los arreglos sistólicos aprovechan esta propiedad haciendo que los datos se desplacen entre PEs vecinos, evitando leerlos repetidamente desde memoria externa. Esta organización reduce la cantidad de accesos a memoria, disminuye la demanda de ancho de banda y mejora la eficiencia energética del acelerador \cite{xu2023survey}.
+
+Por esta razón, la optimización de un arreglo MAC no consiste solamente en colocar más unidades de cómputo, sino en mantenerlas ocupadas la mayor parte del tiempo. Si los PEs no reciben datos a tiempo, el arreglo puede quedar subutilizado aunque tenga una gran cantidad de recursos disponibles. Por eso, el diseño debe balancear la cantidad de MACs, el movimiento de datos y la capacidad de alimentar el arreglo sin generar esperas innecesarias.
+
+En implementaciones recientes también se optimiza el paralelismo dentro de las propias unidades de cómputo. Por ejemplo, HMSA propone mejorar el uso de los recursos DSP en FPGA mediante técnicas de empaquetamiento de datos, permitiendo que un mismo recurso pueda ejecutar más multiplicaciones en paralelo según la combinación de precisión utilizada. Esto muestra que la optimización puede ocurrir tanto a nivel del arreglo completo como dentro de cada PE o unidad MAC \cite{cao2025hmsa}.
+
+\subsection{Flujo de datos en arreglos MAC}
+
+El flujo de datos define la forma en que los operandos y los resultados parciales se mueven dentro del arreglo MAC. Esta decisión es importante porque determina qué datos permanecen más tiempo dentro de los PEs, cuáles se desplazan entre unidades vecinas y cuántas veces se debe acceder a la memoria. En arreglos sistólicos, el flujo de datos suele organizarse de manera regular, aprovechando la comunicación local entre PEs para reducir movimientos innecesarios.
+
+En la literatura se suelen identificar tres estrategias principales de flujo de datos: \textit{Output Stationary}, \textit{Weight Stationary} e \textit{Input Stationary}. En \textit{Output Stationary}, cada PE mantiene un resultado parcial hasta completar la acumulación correspondiente. En \textit{Weight Stationary}, los pesos permanecen dentro de los PEs durante más tiempo, mientras los datos de entrada se desplazan por el arreglo. En \textit{Input Stationary}, ocurre lo contrario: los datos de entrada se mantienen localmente y los pesos o resultados parciales se mueven según la organización del cálculo \cite{xu2023survey}.
+
+La elección del flujo de datos afecta directamente el rendimiento y la eficiencia del acelerador. Por ejemplo, si una estrategia permite reutilizar más veces un dato dentro del arreglo, se reducen los accesos a memoria y se mejora el aprovechamiento de los PEs. Sin embargo, no existe un único flujo óptimo para todos los casos, ya que la mejor opción depende del tipo de operación, del tamaño de las matrices, de la cantidad de memoria disponible y de las restricciones del hardware.
+
+Un ejemplo práctico de esta decisión aparece en HMSA, donde se adopta una arquitectura \textit{Output Stationary} para simplificar el control y mantener los resultados parciales dentro del arreglo durante la operación. Además, el diseño organiza el ingreso de datos mediante mecanismos de retardo y particionamiento, de forma que los operandos lleguen a los PEs en el momento correcto. Esto muestra que el flujo de datos no solo es una idea teórica, sino una decisión concreta de diseño que influye en el rendimiento final del acelerador \cite{cao2025hmsa}.
+
+\subsection{Precisión numérica y eficiencia}
+
+La precisión numérica es otro factor importante en la optimización de arreglos MAC. En muchas aplicaciones de inteligencia artificial no siempre es necesario utilizar formatos de alta precisión, como FP32, para todas las operaciones. En su lugar, se pueden usar representaciones de menor cantidad de bits, como INT8, INT4 o incluso precisiones menores, con el objetivo de reducir el costo computacional, el consumo de memoria y la cantidad de datos que deben moverse dentro del acelerador.
+
+Esta reducción de precisión puede mejorar la eficiencia porque una operación con menos bits requiere menos recursos de hardware y menor ancho de banda. Además, en ciertos casos permite ejecutar más multiplicaciones en paralelo dentro de una misma unidad de cómputo. Sin embargo, disminuir la precisión también puede afectar la exactitud del modelo, por lo que debe existir un equilibrio entre rendimiento y pérdida de precisión. Por esta razón, la cuantización no debe verse solo como una reducción arbitraria de bits, sino como una decisión de diseño que depende tanto del modelo como de la arquitectura utilizada \cite{xu2023survey}.
+
+Un ejemplo reciente de esta idea es HMSA, donde se propone un acelerador sistólico heterogéneo de precisión mixta para FPGA. En este diseño se optimiza el uso de los recursos DSP mediante técnicas de empaquetamiento de datos, de forma que una misma unidad pueda realizar más operaciones de multiplicación dependiendo de la combinación de bits usada en pesos y activaciones. Además, se combinan unidades basadas en DSP con unidades basadas en LUT, llamadas D-MAC y L-MAC, para aprovechar mejor los recursos disponibles en la FPGA \cite{cao2025hmsa}.
+
+Este tipo de optimización muestra que la eficiencia no depende únicamente de reducir la precisión, sino de adaptar esa precisión al hardware real. Si una combinación de bits reduce la exactitud del modelo pero no mejora la velocidad de inferencia, entonces no representa una buena optimización. Por eso, HMSA utiliza un modelo costo-rendimiento para seleccionar configuraciones de precisión que aumenten el rendimiento práctico del acelerador sin degradar innecesariamente la precisión del modelo \cite{cao2025hmsa}.
+
+\subsection{Balance entre cómputo, memoria y comunicación}
+
+En un arreglo MAC, el rendimiento no depende solamente de la cantidad de unidades de cómputo disponibles. También depende de la capacidad del sistema para alimentar esas unidades con datos de forma constante. Si el arreglo puede realizar muchas operaciones por ciclo, pero los datos no llegan a tiempo desde memoria, los PEs deben esperar y el rendimiento real queda por debajo del rendimiento teórico.
+
+Por esta razón, el diseño de arreglos MAC debe balancear tres aspectos: cómputo, memoria y comunicación. El cómputo está relacionado con la cantidad de operaciones MAC que pueden ejecutarse en paralelo. La memoria incluye tanto los buffers internos como los accesos a memoria externa. La comunicación se refiere al movimiento de datos entre memoria, buffers y PEs. Un diseño eficiente busca que los datos se reutilicen dentro del arreglo antes de volver a acceder a memoria externa, reduciendo así latencia, consumo energético y presión sobre el ancho de banda \cite{xu2023survey}.
+
+Este balance también depende del tamaño del arreglo y de los buffers disponibles. Un arreglo más grande puede ofrecer mayor paralelismo, pero también requiere más datos para mantenerse ocupado. De igual forma, buffers más grandes pueden reducir accesos a memoria externa, pero aumentan el consumo de área y energía. Por eso, el diseño óptimo no siempre es el de mayor tamaño, sino aquel que logra una relación adecuada entre recursos disponibles, flujo de datos y carga de trabajo.
+
+En HMSA se observa este tipo de optimización a nivel práctico. El acelerador utiliza una arquitectura sistólica heterogénea basada en recursos DSP y LUT, junto con buffers de entrada, pesos y resultados para reducir accesos frecuentes a memoria externa. Además, emplea mecanismos como particionamiento en \textit{tiles}, planificación tipo \textit{ping-pong} y prelectura de datos para mantener el flujo de información hacia el arreglo. Esto permite mejorar el uso de los recursos de cómputo y reducir esperas durante la inferencia \cite{cao2025hmsa}.
+
+\subsection{Ejemplo conceptual de optimización}
+
+Como ejemplo conceptual, puede considerarse un arreglo MAC utilizado para acelerar una multiplicación de matrices en una red neuronal. En una implementación básica, cada PE ejecuta una operación MAC y acumula resultados parciales. Sin embargo, si todos los PEs reciben datos directamente desde memoria externa, el sistema puede quedar limitado por el ancho de banda disponible. En ese caso, aunque existan muchas unidades MAC, no todas estarán ocupadas de manera constante.
+
+Una primera optimización consiste en organizar el cálculo mediante un flujo de datos que permita reutilizar operandos dentro del arreglo. Por ejemplo, si un dato de entrada o un peso puede ser usado por varios PEs vecinos antes de salir del arreglo, se reducen los accesos a memoria y se mejora la eficiencia energética. Esta idea es la base de los arreglos sistólicos: los datos no solo se leen y se procesan una vez, sino que se desplazan ordenadamente entre unidades de procesamiento para aprovechar mejor cada acceso a memoria \cite{xu2023survey}.
+
+Una segunda optimización consiste en ajustar la precisión numérica al tipo de operación y al hardware disponible. En lugar de utilizar la misma cantidad de bits para todas las operaciones, se pueden usar precisiones menores o mixtas en pesos y activaciones. Esto permite reducir el tamaño de los datos, disminuir el tráfico de memoria y, en algunos casos, ejecutar más multiplicaciones en paralelo dentro de una misma unidad física. En HMSA, por ejemplo, se propone una arquitectura heterogénea que combina unidades D-MAC basadas en DSP y unidades L-MAC basadas en LUT, junto con un modelo costo-rendimiento para seleccionar configuraciones de mayor eficiencia \cite{cao2025hmsa}.
+
+De esta forma, la optimización de arreglos MAC puede entenderse como una combinación de decisiones arquitectónicas: distribuir operaciones en paralelo, reutilizar datos, escoger un flujo de datos adecuado, balancear memoria y cómputo, y adaptar la precisión numérica al hardware. El objetivo final no es solamente aumentar la cantidad de MACs disponibles, sino lograr que el arreglo trabaje de forma sostenida, con menos esperas, menor movimiento de datos y mejor aprovechamiento de los recursos del acelerador.
 
 
 % -------------------------------------------------------
