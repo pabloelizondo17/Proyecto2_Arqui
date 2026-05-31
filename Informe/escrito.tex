@@ -199,6 +199,187 @@ Warp totalmente independiente tome el control del núcleo tensorial e inicie su 
 
 \section{TPU de Google}
 
+Ante el crecimiento exponencial de las cargas de trabajo de inferencia en centros de datos,
+Google diseñó su propia Unidad de Procesamiento Tensorial (TPU, \textit{Tensor Processing Unit}):
+un circuito integrado de aplicación específica (ASIC) orientado a acelerar operaciones de
+álgebra lineal densa propias del aprendizaje profundo \cite{jouppi2023tpuv4}.
+A diferencia del enfoque adoptado por NVIDIA, donde el arreglo sistólico coexiste con
+cientos de núcleos CUDA de propósito general, la TPU subordina toda la superficie del die
+al cómputo matricial, eliminando los mecanismos de ejecución general que,
+como se describió en la sección anterior, son fuente de subutilización en los
+\textit{Tensor Cores}.
+
+
+\subsection{Motivación y origen}
+
+El diseño de la TPU respondió a una proyección concreta: en 2013, Google determinó que
+si el 10\,\% de sus usuarios realizara búsquedas por voz durante tres minutos al día,
+empleando redes neuronales profundas, la demanda computacional de sus centros de datos
+se duplicaría, lo que implicaría una inversión en infraestructura inviable con CPU
+convencionales \cite{jouppi2023tpuv4}.
+Esto motivó el desarrollo de un ASIC de alta eficiencia energética bajo la premisa de
+mejorar el rendimiento por vatio en al menos un orden de magnitud frente a las GPU
+disponibles en ese momento.
+
+La premisa central de diseño que diferencia a la TPU de una GPU es la siguiente:
+dado que más del 90\,\% del tiempo de inferencia en redes neuronales se destina
+a multiplicaciones matriciales \cite{devi2024imac}, el hardware debe maximizar la
+eficiencia de esa operación en particular, en lugar de mantener capacidades de
+ejecución general costosas en área y potencia.
+
+
+\subsection{Arquitectura interna: el núcleo sistólico}
+
+El corazón de la TPU es la \textit{Matrix Multiply Unit} (MXU), un arreglo sistólico
+bidimensional de unidades MAC (\textit{Multiply-Accumulate}) organizadas en una malla
+de procesadores (PE) interconectados localmente \cite{jouppi2023tpuv4}.
+A diferencia de los \textit{Tensor Cores} de NVIDIA —donde el arreglo sistólico es uno
+de los muchos componentes de un SM (\textit{Streaming Multiprocessor})— en la TPU el
+MXU ocupa cerca de un cuarto del área total del die, y la mayor parte del área restante
+corresponde también a estructuras de soporte de datos.
+
+El flujo de datos dentro del MXU sigue la estrategia \textit{Weight Stationary} (WS):
+los pesos de la red neuronal se precagan en los registros de cada PE y permanecen fijos
+durante toda la operación matricial, mientras que los vectores de activación fluyen
+diagonalmente a través del arreglo, generando una onda de cómputo sincronizada ciclo
+a ciclo \cite{jouppi2023tpuv4}.
+Este mecanismo es precisamente el flujo sistólico descrito en la sección anterior,
+aplicado ahora en un ASIC donde no existe ningún overhead de despacho de instrucciones
+ni gestión de \textit{warps} que interrumpa el cómputo matricial.
+
+No obstante, trabajos recientes han identificado que el dataflow \textit{Weight Stationary}
+introduce penalizaciones de rendimiento y energía asociadas a los buffers FIFO que
+sincronizan la entrada y salida del arreglo \cite{abdelmaksoud2026dip}.
+Esta limitación ha motivado investigaciones sobre dataflows alternativos orientados a
+eliminar dichos buffers, como el propuesto por Abdelmaksoud et al. \cite{abdelmaksoud2026dip},
+que reporta mejoras de hasta $1.81\times$ en eficiencia energética y $1.49\times$ en
+latencia frente a arquitecturas tipo TPU en cargas de trabajo de transformers.
+
+Complementando al MXU, la TPU incorpora las siguientes unidades de memoria on-chip:
+
+\begin{itemize}
+    \item \textbf{Unified Buffer (UB):} Memoria SRAM de gran capacidad gestionada
+    explícitamente por el compilador, que almacena las activaciones entre capas
+    consecutivas. A diferencia de una caché convencional, cuyo comportamiento es
+    determinista, el UB es controlado directamente por el compilador XLA, lo que
+    elimina el tráfico impredecible a DRAM que limita el rendimiento de las GPU
+    en cargas de inferencia \cite{jouppi2023tpuv4}.
+
+    \item \textbf{Acumuladores:} Registros de alta precisión (32 bits) que reciben
+    los productos parciales generados por el MXU en cada ciclo de reloj,
+    acumulando el resultado de la operación $D = A \times B + C$ sin
+    necesidad de escrituras intermedias a memoria.
+
+    \item \textbf{Weight FIFO:} Cola de doble buffer que precarga los pesos desde
+    la memoria DRAM externa hacia el MXU, ocultando la latencia de acceso a memoria
+    y manteniendo el arreglo sistólico ocupado de manera continua \cite{jouppi2023tpuv4}.
+\end{itemize}
+
+
+\subsection{Modelo de programación: ISA de dominio específico}
+
+Una diferencia arquitectónica fundamental entre la TPU y una GPU radica en su modelo
+de programación. Mientras que una GPU expone una ISA de tipo SIMT con cientos de
+instrucciones de propósito general gestionadas mediante \textit{warps}, la TPU v1
+adoptó una ISA de tipo CISC con aproximadamente una docena de instrucciones de alto
+nivel orientadas exclusivamente al cómputo de redes neuronales \cite{jouppi2023tpuv4}.
+Las instrucciones fundamentales son cinco:
+
+\begin{enumerate}
+    \item \texttt{Read\_Host\_Memory}: transfiere datos de activación desde la memoria
+    del servidor anfitrión hacia el Unified Buffer.
+    \item \texttt{Read\_Weights}: carga los pesos desde la DRAM externa hacia el
+    Weight FIFO.
+    \item \texttt{MatrixMultiply/Convolve}: ordena al MXU ejecutar una multiplicación
+    matricial o una convolución, tomando como entradas el UB y el Weight FIFO,
+    y depositando los resultados parciales en los Acumuladores.
+    \item \texttt{Activate}: aplica la función de activación no lineal (ReLU, Sigmoid,
+    etc.) sobre los Acumuladores y escribe el resultado en el Unified Buffer.
+    \item \texttt{Write\_Host\_Memory}: transfiere el resultado final desde el
+    Unified Buffer de vuelta a la memoria del servidor anfitrión.
+\end{enumerate}
+
+Este modelo determinista evita exactamente el problema de subutilización descrito en la
+sección anterior: al no existir \textit{warps}, bifurcaciones de código ni cachés
+automáticas, el MXU opera sin interrupciones durante toda la duración de la instrucción
+\texttt{MatrixMultiply}, cuya latencia típica es de cientos a miles de ciclos de reloj.
+
+
+\subsection{Evolución hacia la TPU v4: supercomputador reconfigurable}
+
+La cuarta generación de la TPU, presentada en ISCA 2023, representa un salto cualitativo
+en la escala y las capacidades del sistema \cite{jouppi2023tpuv4}.
+Cada chip TPU v4 contiene dos \textit{TensorCores} (TC); cada TC agrupa cuatro MXU de
+$128 \times 128$ MACs, una unidad de procesamiento vectorial (VPU) de 128 carriles,
+y una memoria vectorial (VMEM) de 16\,MiB. Los dos TensorCores comparten una
+\textit{Common Memory} (CMEM) de 128\,MiB, lo que amplía considerablemente la
+capacidad de datos on-chip frente a generaciones anteriores.
+
+La innovación más significativa de la TPU v4 a nivel de sistema es la incorporación de
+\textit{Optical Circuit Switches} (OCS): conmutadores ópticos basados en espejos
+MEMS (\textit{Micro-Electro-Mechanical Systems}) que reconfiguran dinámicamente la
+topología de interconexión entre los chips en milisegundos \cite{jouppi2023tpuv4}.
+Esto permite escalar el supercomputador a 4096 chips organizados en un toro 3D, cuya
+geometría puede adaptarse por tarea de entrenamiento para maximizar el ancho de banda
+de comunicación colectiva según el tipo de paralelismo empleado (de datos, de modelo
+o de pipeline).
+
+Los OCS representan menos del 5\,\% del costo total del sistema y menos del 3\,\% de
+su consumo de potencia, pero aportan cuatro beneficios operativos fundamentales:
+disponibilidad (se redirige el tráfico alrededor de nodos fallidos), modularidad
+(cada rack de 64 chips puede ponerse en producción de forma independiente),
+flexibilidad topológica (soporte para toro torcido (\textit{twisted torus}), que mejora
+el rendimiento todo-a-todo en $1.31\times$--$1.63\times$ frente al toro rectangular),
+y aislamiento de red entre usuarios distintos que comparten el supercomputador
+\cite{jouppi2023tpuv4}.
+
+En cuanto a rendimiento, la TPU v4 supera a la TPU v3 en $2.1\times$ y mejora la
+eficiencia energética en $2.7\times$. Comparada con sistemas de tamaño similar,
+es $1.2\times$--$1.7\times$ más rápida y consume $1.3\times$--$1.9\times$ menos
+potencia que la NVIDIA A100 \cite{jouppi2023tpuv4}.
+
+
+\subsection{SparseCores: soporte hardware para embeddings}
+
+Con la proliferación de los modelos de recomendación (\textit{Deep Learning Recommendation
+Models}, DLRM) y los transformers, el perfil de carga de los centros de datos de Google
+evolucionó significativamente: mientras que en 2016 el 61\,\% de los ciclos TPU se
+destinaban a perceptrones multicapa (MLP), en octubre de 2022 el 57\,\% correspondía
+a transformers \cite{jouppi2023tpuv4}.
+
+Los modelos DLRM dependen de operaciones de \textit{embedding}: búsquedas dispersas
+(\textit{sparse lookups}) en tablas de gran tamaño que pueden alcanzar varios TiB en
+agregado.
+Estas operaciones tienen baja intensidad aritmética y patrones de acceso a memoria
+irregulares, lo que las hace inadecuadas para el MXU, cuya eficiencia depende de la
+densidad de las operaciones matriciales \cite{jouppi2023tpuv4}.
+Colocarlas en las CPU anfitrionas introduciría un cuello de botella de ley de Amdahl
+agravado por la proporción de 4:1 entre chips TPU y hosts CPU.
+
+La solución adoptada por Google a partir de la TPU v2 es el \textit{SparseCore} (SC):
+un procesador de flujo de datos especializado en operaciones de gather/scatter dispersas,
+integrado en el mismo die que el TensorCore pero con circuitería optimizada para accesos
+irregulares a HBM \cite{jouppi2023tpuv4}.
+Usando solo el 5\,\% del área y la potencia del die, el SparseCore acelera los modelos
+con embeddings entre $5\times$ y $7\times$ respecto a ejecutarlos en el TensorCore,
+resolviendo el desbalance de carga que de otra forma limitaría la escalabilidad de los
+DLRM en el supercomputador.
+
+Este enfoque de integrar unidades heterogéneas especializadas en un mismo ASIC —un
+TensorCore denso para transformers y un SparseCore para embeddings— ilustra la
+tendencia general en el diseño de arquitecturas de dominio específico: en lugar de
+optimizar una única unidad de cómputo, se diseña un conjunto de bloques cada uno
+especializado para la clase de operación que domina su segmento de la carga de trabajo
+\cite{jouppi2023tpuv4}.
+Investigaciones recientes han explorado extensiones de este principio al nivel del
+arreglo sistólico, buscando co-diseñar la estructura del hardware con las propiedades
+de los modelos, como el co-diseño entre dimensiones del arreglo y bloques de
+\textit{pruning} estructurado propuesto por Palacios et al.\ \cite{palacios2024pruning},
+que reporta aceleraciones de hasta el 44\,\% en sistemas edge con solo un 1.4\,\% de
+degradación en la tasa de error.
+
+
+
 \section{Optimización de arreglos MAC}
 
 
