@@ -7,7 +7,7 @@
 \usepackage{textcomp}
 \usepackage{xcolor}
 
-\usepackage[spanish, es-tabla]{babel}
+\usepackage[spanish, es-tabla, es-noshorthands]{babel}
 \usepackage{float}
 \usepackage{booktabs}
 \usepackage{tabularx}
@@ -77,14 +77,126 @@ tencioyonaikel@estudiantec.cr}
 \maketitle
 \thispagestyle{firstpage} 
 
-
 \section{Introducción}
+
+Durante décadas, el incremento del rendimiento computacional estuvo impulsado principalmente por procesadores de propósito general cada vez más rápidos. Sin embargo, el crecimiento de aplicaciones como el aprendizaje profundo, el procesamiento masivo de datos y la computación científica ha puesto en evidencia una limitación importante: no todas las cargas de trabajo se benefician por igual de una arquitectura diseñada para ejecutar una amplia variedad de tareas. En muchos casos, la mayor parte del tiempo de ejecución se concentra en un conjunto reducido de operaciones repetitivas, lo que ha motivado el desarrollo de arquitecturas de dominio específico (\textit{Domain-Specific Architectures}, DSA), diseñadas para maximizar la eficiencia sobre un tipo particular de cómputo~\cite{liao2025nn}.
+
+Entre las arquitecturas especializadas más influyentes se encuentran los arreglos sistólicos, una organización a nivel de hardware propuesta originalmente para acelerar operaciones matriciales mediante una comunicación local y altamente regular entre elementos de procesamiento~\cite{puscasu2024sa}. A diferencia de los procesadores tradicionales, donde los datos deben desplazarse constantemente entre memoria y unidades de ejecución, los arreglos sistólicos permiten reutilizar la información conforme atraviesa la arquitectura, reduciendo significativamente el costo asociado al movimiento de datos.
+
+La importancia práctica de este paradigma se ha intensificado en los últimos años, no por una novedad conceptual sino por el tipo de cargas que dominan actualmente los centros de cómputo. Las multiplicaciones de matrices, las convoluciones y los productos punto constituyen la base computacional de la mayoría de las redes neuronales modernas, y todas estas operaciones pueden expresarse en última instancia como secuencias masivas de operaciones \textit{Multiply-Accumulate} (MAC)~\cite{liao2025nn}. Es precisamente este patrón ---intenso en aritmética pero también en movimiento de datos--- el que los arreglos sistólicos están particularmente bien preparados para resolver, y la razón por la que numerosas plataformas de aceleración modernas incorporan principios sistólicos en sus diseños.
+
+Antes de analizar implementaciones concretas como los núcleos tensoriales de NVIDIA, las \textit{Tensor Processing Units} (TPU) de Google y las estrategias modernas de optimización de arreglos MAC, resulta necesario comprender los fundamentos arquitectónicos que comparten estas soluciones. En la siguiente sección se introducen el concepto de arreglo sistólico, sus elementos de procesamiento, el flujo de datos que los caracteriza y los mecanismos que les permiten explotar paralelismo masivo en aplicaciones matriciales.
 
 
 \section{Fundamentos teóricos}
 
-...
+\subsection{Origen y concepto}
 
+Un arreglo sistólico es una red de elementos de procesamiento idénticos, organizados típicamente en una malla bidimensional, a través de la cual los datos fluyen de manera sincronizada de un elemento al siguiente sin pasar por memoria intermedia~\cite{puscasu2024sa}. El nombre proviene de una analogía fisiológica: del mismo modo en que el corazón bombea sangre en pulsos regulares, en un arreglo sistólico los datos avanzan ciclo a ciclo, manteniendo un ritmo uniforme de propagación entre vecinos inmediatos.
+
+El concepto fue introducido por H. T. Kung y C. E. Leiserson a finales de la década de 1970, en un contexto orientado al diseño VLSI~\cite{liao2025nn}. La motivación original era práctica: en ese momento el costo dominante de un circuito integrado no era el silicio dedicado al cómputo, sino el cableado necesario para mover datos entre módulos distantes. Restringir las comunicaciones únicamente a vecinos físicos resolvía este problema y permitía construir aceleradores con un \textit{layout} regular, fácilmente replicable y energéticamente eficiente. Décadas después, el resurgimiento del paradigma se debe a que las cargas dominantes del cómputo moderno ---multiplicaciones matriciales masivas en redes neuronales--- coinciden exactamente con el tipo de operación para el que los arreglos sistólicos fueron concebidos~\cite{liao2025nn}.
+
+\subsection{El elemento de procesamiento}
+
+La unidad básica de un arreglo sistólico es el \textit{Processing Element} (PE), un circuito comparativamente sencillo que cumple dos funciones simultáneas durante cada ciclo de reloj. Como nodo de cómputo, ejecuta una operación aritmética básica sobre los operandos que recibe. Como etapa de \textit{pipeline}, propaga esos mismos operandos hacia sus vecinos en la malla. Esta dualidad es esencial: un PE no es solamente un calculador, sino también un eslabón del flujo de datos que recorre el arreglo~\cite{puscasu2024sa}.
+
+Internamente, un PE típico contiene un multiplicador, un sumador, un registro acumulador para almacenar resultados parciales, y registros de entrada y salida que conectan al PE con sus vecinos en las direcciones horizontal y vertical~\cite{liao2025nn}. La Fig.~\ref{fig:pe} muestra esta organización de forma esquemática. Algunas variantes incluyen además un pequeño espacio de almacenamiento local que permite retener uno de los operandos durante varios ciclos, característica que será relevante al discutir las estrategias de flujo de datos en secciones posteriores.
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[
+    >={Stealth[length=2.5mm]},
+    every node/.style={font=\footnotesize},
+    op/.style={draw, circle, minimum size=7mm, inner sep=0pt, font=\small, fill=white},
+    reg/.style={draw, rectangle, minimum width=9mm, minimum height=6mm, fill=white}
+]
+\draw[dashed, gray!60] (-1.7,-1.7) rectangle (4.3,1.8);
+\node[text=gray!80, font=\scriptsize] at (3.85,1.55) {PE};
+
+\node[op]  (mult) at (0,0) {$\times$};
+\node[op]  (add)  at (1.5,0) {$+$};
+\node[reg] (acc)  at (3,0) {acc};
+
+\draw[->] (-2.5,0) node[left] {$a$} -- (mult);
+\draw[->] (0,2.1) node[above] {$b$} -- (mult);
+
+\draw[->] (mult) -- (add);
+\draw[->] (add)  -- (acc);
+\draw[->] (acc.south) -- ++(0,-0.7) -| (add.south);
+\end{tikzpicture}
+\caption{Esquema simplificado de un PE. La operación MAC se implementa con un multiplicador, un sumador y un acumulador con retroalimentación; los caminos de propagación hacia los PEs vecinos no se muestran.}
+\end{figure}
+
+\subsection{La operación MAC}
+
+La operación que ejecuta cada PE en cada ciclo se denomina MAC, por \textit{Multiply-Accumulate}. Consiste en multiplicar dos operandos y sumar el resultado a un acumulador interno:
+
+\begin{equation}
+    \mathrm{acc} \leftarrow \mathrm{acc} + a \cdot b
+    \label{eq:MAC}
+\end{equation}
+
+A pesar de su simplicidad, esta operación constituye el núcleo computacional de prácticamente toda carga matricial. Una multiplicación de matrices de dimensión $N \times N$ se descompone exactamente en $N^3$ operaciones MAC; las convoluciones de las redes neuronales se reducen a sumas ponderadas implementadas también como MACs; y los productos punto en capas completamente conectadas siguen el mismo patrón~\cite{liao2025nn}. Por esta razón los fabricantes de aceleradores miden la capacidad de sus dispositivos en TOPS (\textit{tera-operations per second}), métrica que en la práctica cuantifica el número de MACs ejecutadas por segundo. La eficiencia de un acelerador, en consecuencia, depende no solo de cuántas unidades MAC pueda integrar, sino de qué tan ocupadas pueda mantenerlas a lo largo del tiempo. Las estrategias para lograr esta ocupación sostenida ---organización del flujo de datos, ajustes de precisión numérica y balance entre cómputo y memoria--- se examinan en detalle en la sección dedicada a la optimización de arreglos MAC.
+
+\subsection{Flujo de datos entre elementos}
+
+Lo que distingue a un arreglo sistólico de un simple banco paralelo de unidades MAC es precisamente cómo se conectan y comunican sus PEs. En una malla bidimensional para multiplicación matricial, los operandos se inyectan desde dos bordes ortogonales del arreglo y se propagan en direcciones perpendiculares. Para el cómputo $C = A \times B$, los elementos de la matriz $A$ entran por el lado izquierdo y avanzan horizontalmente, fila por fila, mientras que los elementos de $B$ entran por el lado superior y avanzan verticalmente, columna por columna~\cite{puscasu2024sa}. La Fig.~\ref{fig:sa-grid} ilustra este patrón sobre una malla de $3\times 3$ PEs.
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[
+    >={Stealth[length=2.5mm]},
+    pe/.style={draw, rounded corners, minimum size=10mm, font=\footnotesize, fill=white},
+    every node/.style={font=\footnotesize}
+]
+\foreach \i in {0,1,2} {
+  \foreach \j in {0,1,2} {
+    \pgfmathsetmacro{\x}{\j*1.4}
+    \pgfmathsetmacro{\y}{-\i*1.4}
+    \node[pe] (p\i\j) at (\x,\y) {PE};
+  }
+}
+
+\foreach \i in {0,1,2} {
+  \draw[->, thick] (-1.4,-\i*1.4) -- (p\i0.west);
+  \foreach \j/\jnext in {0/1,1/2} {
+    \draw[->] (p\i\j.east) -- (p\i\jnext.west);
+  }
+}
+
+\foreach \j in {0,1,2} {
+  \draw[->, thick] (\j*1.4,1.4) -- (p0\j.north);
+  \foreach \i/\inext in {0/1,1/2} {
+    \draw[->] (p\i\j.south) -- (p\inext\j.north);
+  }
+}
+
+\node at (-2.0, 0)    {fila 0 de $A$};
+\node at (-2.0,-1.4)  {fila 1 de $A$};
+\node at (-2.0,-2.8)  {fila 2 de $A$};
+\node at (0,    1.85) {col.\ 0 de $B$};
+\node at (1.4,  1.85) {col.\ 1 de $B$};
+\node at (2.8,  1.85) {col.\ 2 de $B$};
+\end{tikzpicture}
+\caption{Arreglo sistólico de $3\times 3$ PEs para la multiplicación $C = A \times B$. Las filas de $A$ entran por la izquierda y las columnas de $B$ por arriba.}
+\label{fig:sa-grid}
+\end{figure}
+
+Esta propagación no es instantánea ni libre. Como los datos tardan ciclos en alcanzar los PEs más alejados de los bordes, las filas y columnas deben introducirse de forma escalonada en el tiempo. En la práctica este escalonamiento se logra insertando ceros al inicio de cada flujo, de modo que el dato correcto llegue al PE correcto en el ciclo correcto~\cite{puscasu2024sa}. El resultado es lo que en la literatura se denomina un patrón de onda o \textit{wavefront}: una diagonal de actividad que cruza el arreglo desde la esquina superior izquierda hacia la inferior derecha conforme avanzan los ciclos~\cite{liao2025nn}.
+
+Cada PE, al recibir simultáneamente un elemento de $A$ y uno de $B$, ejecuta una operación MAC y luego propaga ambos operandos hacia sus vecinos derecho e inferior. De esta forma, un mismo elemento de $A$ termina siendo utilizado por todos los PEs de su fila antes de salir del arreglo, y un mismo elemento de $B$ por todos los PEs de su columna. Esta reutilización es el verdadero aporte del paradigma sistólico: el dato más costoso ---el que viene desde la memoria principal--- se amortiza sobre múltiples operaciones aritméticas antes de descartarse, en lugar de tener que releerse cada vez que se necesita. La forma específica en que las arquitecturas comerciales materializan esta inyección escalonada y la propagación entre PEs ---por ejemplo, cómo los núcleos tensoriales de NVIDIA orquestan el avance del frente de onda dentro de un \textit{Streaming Multiprocessor}--- se examina en la siguiente sección.
+
+\subsection{Paralelismo y multiplicación matricial}
+
+El paralelismo de un arreglo sistólico es espacial e inherente a su estructura. Una vez que el frente de onda ha cruzado el arreglo y todos los PEs están alimentados, una malla de $N \times N$ unidades puede sostener hasta $N^2$ operaciones MAC simultáneas por ciclo~\cite{liao2025nn}. Este crecimiento cuadrático del paralelismo con el tamaño del arreglo es precisamente lo que hace al paradigma tan atractivo para cargas matriciales modernas, donde el número de operaciones también crece de forma cuadrática con la dimensión del problema.
+
+El rendimiento real, sin embargo, nunca alcanza el pico teórico. El frente de onda tarda en llenar el arreglo y, una vez completada la operación, también tarda en vaciarlo, dejando ciclos iniciales y finales con utilización parcial. Este efecto se acentúa cuando las matrices de entrada son demasiado pequeñas para llenar el arreglo o cuando sus dimensiones no coinciden exactamente con la geometría del hardware~\cite{liao2025nn}. Por esa razón, el diseño de un acelerador sistólico no se reduce a elegir un arreglo grande, sino a balancear la cantidad de PEs disponibles, el patrón de alimentación de datos y la geometría típica de las cargas que se desea acelerar.
+
+\subsection{Conexión con las arquitecturas modernas}
+
+Los conceptos introducidos en esta sección ---el PE como unidad básica, la operación MAC como núcleo aritmético, la propagación sincronizada de datos entre vecinos, la reutilización implícita y el paralelismo espacial--- constituyen la base común sobre la que se construyen las tres arquitecturas que se examinan en el resto del trabajo. La decisión de qué dato permanece estacionario dentro del PE y cuáles fluyen a través del arreglo define lo que en la literatura se denomina la estrategia de \textit{dataflow}, concepto que reaparecerá de forma explícita en la sección sobre optimización de arreglos MAC.
+
+Los núcleos tensoriales de NVIDIA, descritos en la siguiente sección, incrustan arreglos sistólicos dentro de los multiprocesadores de \textit{streaming} de una GPU, donde conviven con cientos de núcleos CUDA de propósito general. La TPU de Google, por su parte, lleva el principio sistólico al extremo opuesto: dedica casi toda la superficie del \textit{die} a una única gran malla de PEs gobernada por un compilador determinista. Finalmente, las técnicas modernas de optimización de arreglos MAC abordan el problema desde una tercera perspectiva, ajustando la precisión numérica, el flujo de datos y el balance entre cómputo y memoria para extraer mayor eficiencia del mismo principio fundamental. Las tres alternativas son, en esencia, decisiones distintas tomadas sobre el mismo punto de partida que se acaba de describir.
 \section{Núcleos tensoriales}
 Ante el rápido avance de la inteligencia artificial y del aprendizaje profundo, 
 las unidades de cómputo tradicionales (como los procesadores de flujo convencionales),
