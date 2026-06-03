@@ -1,37 +1,110 @@
 \relax 
 \providecommand \babel@aux [2]{\global \let \babel@toc \@gobbletwo }
 \@nameuse{bbl@beforestart}
-\catcode `"\active 
-\catcode `<\active 
-\catcode `>\active 
-\@nameuse{es@quoting}
 \providecommand\hyper@newdestlabel[2]{}
 \providecommand\HyField@AuxAddToFields[1]{}
 \providecommand\HyField@AuxAddToCoFields[2]{}
-\citation{feng2025tensor}
-\citation{feng2025tensor}
+\citation{liao2025nn}
+\citation{puscasu2024sa}
+\citation{liao2025nn}
+\citation{puscasu2024sa}
+\citation{liao2025nn}
+\citation{liao2025nn}
+\citation{puscasu2024sa}
 \babel@aux{spanish}{}
 \@writefile{toc}{\contentsline {section}{\numberline {I}Introducción}{1}{section.1}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {II}Fundamentos teóricos}{1}{section.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {III}Núcleos tensoriales}{1}{section.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-A}}El Arreglo Sistólico como el núcleo del Tensor Core}{1}{subsection.3.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-B}}La operación MMA}{1}{subsection.3.2}\protected@file@percent }
-\newlabel{eq:MMA}{{1}{1}{La operación MMA}{equation.1}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-C}}Flujo de ejecución en el Hardware}{1}{subsection.3.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-C}1}Segmentación por bloques}{1}{subsubsection.3.3.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-C}2}Distribución escalonada de datos}{1}{subsubsection.3.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-A}}Origen y concepto}{1}{subsection.2.1}\protected@file@percent }
+\citation{liao2025nn}
+\citation{liao2025nn}
+\citation{puscasu2024sa}
+\citation{puscasu2024sa}
+\citation{liao2025nn}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Esquema simplificado de un PE. La operación MAC se implementa con un multiplicador, un sumador y un acumulador con retroalimentación; los caminos de propagación hacia los PEs vecinos no se muestran.}}{2}{figure.caption.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-B}}El elemento de procesamiento}{2}{subsection.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-C}}La operación MAC}{2}{subsection.2.3}\protected@file@percent }
+\newlabel{eq:MAC}{{1}{2}{La operación MAC}{equation.1}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Arreglo sistólico de $3\times 3$ PEs para la multiplicación $C = A \times B$. Las filas de $A$ entran por la izquierda y las columnas de $B$ por arriba.}}{2}{figure.caption.2}\protected@file@percent }
+\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
+\newlabel{fig:sa-grid}{{2}{2}{Arreglo sistólico de $3\times 3$ PEs para la multiplicación $C = A \times B$. Las filas de $A$ entran por la izquierda y las columnas de $B$ por arriba}{figure.caption.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-D}}Flujo de datos entre elementos}{2}{subsection.2.4}\protected@file@percent }
+\citation{liao2025nn}
+\citation{liao2025nn}
+\citation{feng2025tensor}
+\citation{feng2025tensor}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-E}}Paralelismo y multiplicación matricial}{3}{subsection.2.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-F}}Conexión con las arquitecturas modernas}{3}{subsection.2.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {III}Núcleos tensoriales}{3}{section.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-A}}El Arreglo Sistólico como el núcleo del Tensor Core}{3}{subsection.3.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-B}}La operación MMA}{3}{subsection.3.2}\protected@file@percent }
+\newlabel{eq:MMA}{{2}{3}{La operación MMA}{equation.2}{}}
 \citation{nada2025cooperative}
 \citation{nada2025cooperative}
 \citation{nada2025cooperative}
+\citation{jouppi2023tpuv4}
+\citation{jouppi2023tpuv4}
+\citation{devi2024imac}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-C}}Flujo de ejecución en el Hardware}{4}{subsection.3.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-C}1}Segmentación por bloques}{4}{subsubsection.3.3.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-C}2}Distribución escalonada de datos}{4}{subsubsection.3.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-C}3}El flujo sistólico y el reúso de datos}{4}{subsubsection.3.3.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-C}4}Acumulación y resultado final}{4}{subsubsection.3.3.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-D}}El problema de la subutilización}{4}{subsection.3.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-E}}La dimensión de ejecución y el rol de los warps}{4}{subsection.3.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {IV}TPU de Google}{4}{section.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-A}}Motivación y origen}{4}{subsection.4.1}\protected@file@percent }
+\citation{jouppi2023tpuv4}
+\citation{jouppi2023tpuv4}
+\citation{abdelmaksoud2026dip}
+\citation{abdelmaksoud2026dip}
+\citation{jouppi2023tpuv4}
+\citation{jouppi2023tpuv4}
+\citation{jouppi2023tpuv4}
+\citation{jouppi2023tpuv4}
+\citation{jouppi2023tpuv4}
+\citation{jouppi2023tpuv4}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-B}}Arquitectura interna: el núcleo sistólico}{5}{subsection.4.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-C}}Modelo de programación: ISA de dominio específico}{5}{subsection.4.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-D}}Evolución hacia la TPU v4: supercomputador reconfigurable}{5}{subsection.4.4}\protected@file@percent }
+\citation{jouppi2023tpuv4}
+\citation{jouppi2023tpuv4}
+\citation{jouppi2023tpuv4}
+\citation{jouppi2023tpuv4}
+\citation{jouppi2023tpuv4}
+\citation{palacios2024pruning}
+\citation{xu2023survey}
+\citation{xu2023survey}
+\citation{cao2025hmsa}
+\citation{xu2023survey}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-E}}SparseCores: soporte hardware para embeddings}{6}{subsection.4.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {V}Optimización de arreglos MAC}{6}{section.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-A}}Rol de las operaciones MAC en cargas matriciales}{6}{subsection.5.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-B}}Paralelismo y reutilización de datos}{6}{subsection.5.2}\protected@file@percent }
+\citation{cao2025hmsa}
+\citation{xu2023survey}
+\citation{cao2025hmsa}
+\citation{xu2023survey}
+\citation{cao2025hmsa}
+\citation{cao2025hmsa}
+\citation{xu2023survey}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-C}}Flujo de datos en arreglos MAC}{7}{subsection.5.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-D}}Precisión numérica y eficiencia}{7}{subsection.5.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-E}}Balance entre cómputo, memoria y comunicación}{7}{subsection.5.5}\protected@file@percent }
+\citation{cao2025hmsa}
+\citation{xu2023survey}
+\citation{cao2025hmsa}
 \bibstyle{IEEEtran}
 \bibdata{literatura}
-\bibcite{feng2025tensor}{1}
-\bibcite{nada2025cooperative}{2}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-C}3}El flujo sistólico y el reúso de datos}{2}{subsubsection.3.3.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-C}4}Acumulación y resultado final}{2}{subsubsection.3.3.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-D}}El problema de la subutilización}{2}{subsection.3.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-E}}La dimensión de ejecución y el rol de los warps}{2}{subsection.3.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {IV}TPU de Google}{2}{section.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {V}Optimización de arreglos MAC}{2}{section.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{Referencias}{2}{section*.1}\protected@file@percent }
-\gdef \@abspage@last{2}
+\bibcite{liao2025nn}{1}
+\bibcite{puscasu2024sa}{2}
+\bibcite{feng2025tensor}{3}
+\bibcite{nada2025cooperative}{4}
+\bibcite{jouppi2023tpuv4}{5}
+\bibcite{devi2024imac}{6}
+\bibcite{abdelmaksoud2026dip}{7}
+\bibcite{palacios2024pruning}{8}
+\bibcite{xu2023survey}{9}
+\bibcite{cao2025hmsa}{10}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-F}}Ejemplo conceptual de optimización}{8}{subsection.5.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{Referencias}{8}{section*.3}\protected@file@percent }
+\gdef \@abspage@last{8}
