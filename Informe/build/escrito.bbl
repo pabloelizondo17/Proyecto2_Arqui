@@ -58,18 +58,17 @@ D.~N. Devi, G.~A. Kumar, B.~Gowda, and M.~Rao, ``Integrated {MAC}-based
   the Great Lakes Symposium on VLSI (GLSVLSI '24)}.\hskip 1em plus 0.5em minus
   0.4em\relax ACM, 2024, pp. 1--4.
 
+\bibitem{jouppi2017tpu}
+N.~P. Jouppi, C.~Young, N.~Patil, D.~Patterson \emph{et~al.}, ``In-datacenter
+  performance analysis of a tensor processing unit,'' in \emph{Proceedings of
+  the 44th Annual International Symposium on Computer Architecture (ISCA
+  '17)}.\hskip 1em plus 0.5em minus 0.4em\relax ACM, 2017, pp. 1--12.
+
 \bibitem{abdelmaksoud2026dip}
 A.~J. Abdelmaksoud, S.~Agwa, and T.~Prodromakis, ``{DiP}: A scalable,
   energy-efficient systolic array for matrix multiplication acceleration,''
   \emph{IEEE Transactions on Circuits and Systems I: Regular Papers}, vol.~73,
   no.~1, pp. 283--296, 2026.
-
-\bibitem{palacios2024pruning}
-P.~Palacios, R.~Medina, J.-L. Rouas, G.~Ansaloni, and D.~Atienza, ``Systolic
-  arrays and structured pruning co-design for efficient transformers in edge
-  systems,'' in \emph{Proceedings of the ACM/IEEE International Symposium on
-  Low Power Electronics and Design (ISLPED)}.\hskip 1em plus 0.5em minus
-  0.4em\relax ACM, 2024.
 
 \bibitem{xu2023survey}
 R.~Xu, S.~Ma, Y.~Guo, and D.~Li, ``A survey of design and optimization for

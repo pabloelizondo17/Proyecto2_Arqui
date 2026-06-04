@@ -17,42 +17,42 @@ Database file #1: literatura.bib
 Done.
 You've used 10 entries,
             4087 wiz_defined-function locations,
-            880 strings with 9830 characters,
-and the built_in function-call counts, 8755 in all, are:
-= -- 638
-> -- 263
-< -- 67
-+ -- 137
+            882 strings with 9787 characters,
+and the built_in function-call counts, 9029 in all, are:
+= -- 663
+> -- 267
+< -- 73
++ -- 140
 - -- 50
-* -- 439
-:= -- 1232
+* -- 452
+:= -- 1267
 add.period$ -- 25
 call.type$ -- 10
 change.case$ -- 10
-chr.to.int$ -- 159
+chr.to.int$ -- 174
 cite$ -- 10
-duplicate$ -- 624
-empty$ -- 748
+duplicate$ -- 638
+empty$ -- 763
 format.name$ -- 60
-if$ -- 2051
+if$ -- 2117
 int.to.chr$ -- 0
 int.to.str$ -- 10
-missing$ -- 123
+missing$ -- 124
 newline$ -- 53
 num.names$ -- 10
-pop$ -- 309
+pop$ -- 308
 preamble$ -- 1
 purify$ -- 0
 quote$ -- 2
-skip$ -- 647
+skip$ -- 666
 stack$ -- 0
-substring$ -- 378
-swap$ -- 500
-text.length$ -- 14
+substring$ -- 412
+swap$ -- 519
+text.length$ -- 15
 text.prefix$ -- 0
 top$ -- 5
 type$ -- 10
 warning$ -- 0
-while$ -- 42
+while$ -- 46
 width$ -- 12
-write$ -- 116
+write$ -- 117

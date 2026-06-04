@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.2) (preloaded format=pdflatex 2026.3.18)  2 JUN 2026 21:21
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.2) (preloaded format=pdflatex 2026.3.18)  4 JUN 2026 09:35
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -683,10 +683,10 @@ Package: fancyhdr 2025/02/07 v5.2 Extensive control of page headers and footers
 File: l3backend-pdftex.def 2025-10-09 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count350
 ) (c:\LaTex\Proyecto2_Arqui\Informe\build\escrito.aux
-LaTeX Info: Redefining \. on input line 14.
-LaTeX Info: Redefining \% on input line 14.
+LaTeX Info: Redefining \. on input line 13.
+LaTeX Info: Redefining \% on input line 13.
 Package babel Info: 'spanish' activates 'spanish' shorthands.
-(babel)             Reported on input line 14.
+(babel)             Reported on input line 13.
 )
 \openout1 = `escrito.aux'.
 
@@ -742,21 +742,28 @@ Package caption Info: End \AtBeginDocument code.
 
 
 ]
-
-LaTeX Warning: Reference `fig:pe' on page 2 undefined on input line 103.
-
-LaTeX Font Info:    Trying to load font information for U+msa on input line 116.
-(C:\Users\pablo\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsa.fd
+LaTeX Font Info:    Trying to load font information for U+msa on input line 120.
+ (C:\Users\pablo\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 116.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 120.
  (C:\Users\pablo\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 ) [2] [3] [4]
-LaTeX Font Info:    Trying to load font information for OT1+pcr on input line 357.
+<fig/tpu_block_diagram.png, id=201, 386.94562pt x 282.30469pt>
+File: fig/tpu_block_diagram.png Graphic file (type png)
+<use fig/tpu_block_diagram.png>
+Package pdftex.def Info: fig/tpu_block_diagram.png  used on input line 332.
+(pdftex.def)             Requested size: 252.0pt x 183.8534pt.
+LaTeX Font Info:    Trying to load font information for OT1+pcr on input line 361.
  (C:\Users\pablo\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\ot1pcr.fd
 File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
-) [5] [6] [7] (c:\LaTex\Proyecto2_Arqui\Informe\build\escrito.bbl)
+) [5 <./fig/tpu_block_diagram.png>]
+Overfull \hbox (12.02536pt too wide) in paragraph at lines 392--406
+ [][] 
+ []
+
+[6] [7] [8] (c:\LaTex\Proyecto2_Arqui\Informe\build\escrito.bbl)
 
 ** Conference Paper **
 Before submitting the final camera ready copy, remember to:
@@ -768,37 +775,29 @@ Before submitting the final camera ready copy, remember to:
  uses only Type 1 fonts and that every step in the generation
  process uses the appropriate paper size.
 
-
-Package caption Warning: Unused \captionsetup[table] on input line 20.
-See the caption package documentation for explanation.
-
-[8] (c:\LaTex\Proyecto2_Arqui\Informe\build\escrito.aux
-LaTeX Info: Redefining \. on input line 14.
-LaTeX Info: Redefining \% on input line 14.
+[9] (c:\LaTex\Proyecto2_Arqui\Informe\build\escrito.aux
+LaTeX Info: Redefining \. on input line 13.
+LaTeX Info: Redefining \% on input line 13.
 )
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2026-01-19>
  ***********
-
-
-LaTeX Warning: There were undefined references.
-
 Package rerunfilecheck Info: File `escrito.out' has not changed.
-(rerunfilecheck)             Checksum: FBB0C51B93A81E2819097CB1C680419B;7288.
+(rerunfilecheck)             Checksum: B6F4C24FB3BB5906779FF6D17F9F106B;7336.
  ) 
 Here is how much of TeX's memory you used:
- 27019 strings out of 467867
- 526648 string characters out of 5418334
- 971532 words of memory out of 5000000
- 55403 multiletter control sequences out of 15000+600000
- 665065 words of font info for 117 fonts, out of 8000000 for 9000
+ 27045 strings out of 467867
+ 527179 string characters out of 5418334
+ 973219 words of memory out of 5000000
+ 55422 multiletter control sequences out of 15000+600000
+ 668375 words of font info for 120 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 84i,12n,94p,1134b,911s stack positions out of 10000i,1000n,20000p,200000b,200000s
-<C:/Users/pablo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Users/pablo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi8.pfb><C:/Users/pablo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/pablo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr7.pfb><C:/Users/pablo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr9.pfb><C:/Users/pablo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/pablo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy9.pfb><C:/Users/pablo/AppData/Local/Programs/MiKTeX/fonts/type1/urw/courier/ucrr8a.pfb><C:/Users/pablo/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmb8a.pfb><C:/Users/pablo/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmr8a.pfb><C:/Users/pablo/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmri8a.pfb>
-Output written on c:\LaTex\Proyecto2_Arqui\Informe\build\escrito.pdf (8 pages, 217689 bytes).
+ 84i,13n,94p,1140b,911s stack positions out of 10000i,1000n,20000p,200000b,200000s
+<C:/Users/pablo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Users/pablo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi8.pfb><C:/Users/pablo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/pablo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr7.pfb><C:/Users/pablo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr9.pfb><C:/Users/pablo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/pablo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy8.pfb><C:/Users/pablo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy9.pfb><C:/Users/pablo/AppData/Local/Programs/MiKTeX/fonts/type1/urw/courier/ucrr8a.pfb><C:/Users/pablo/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmb8a.pfb><C:/Users/pablo/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmbi8a.pfb><C:/Users/pablo/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmr8a.pfb><C:/Users/pablo/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmri8a.pfb>
+Output written on c:\LaTex\Proyecto2_Arqui\Informe\build\escrito.pdf (9 pages, 329525 bytes).
 PDF statistics:
- 316 PDF objects out of 1000 (max. 8388607)
- 61 named destinations out of 1000 (max. 500000)
- 269 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 340 PDF objects out of 1000 (max. 8388607)
+ 65 named destinations out of 1000 (max. 500000)
+ 282 words of extra memory for PDF output out of 10000 (max. 10000000)
 
